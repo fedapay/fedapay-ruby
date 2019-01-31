@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-module Stripe
+module FedaPay
   module APIOperations
     module Request
       module ClassMethods
         def request(method, url, params = {}, header = {})
           opts = Util.normalize_opts(opts)
-          opts[:client] ||= StripeClient.active_client
+          opts[:client] ||= FedaPayClient.active_client
 
           headers = opts.clone
           api_key = headers.delete(:api_key)

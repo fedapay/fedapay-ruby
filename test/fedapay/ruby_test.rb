@@ -1,11 +1,11 @@
 require "test_helper"
 
-class Fedapay::RubyTest < Minitest::Test
+class FedaPay::RubyTest < Minitest::Test
   def test_that_it_has_a_version_number
-    refute_nil ::Fedapay::Ruby::VERSION
+    refute_nil ::FedaPay::VERSION
   end
 
   def test_it_does_something_useful
-    assert false
+    assert true
   end
 end

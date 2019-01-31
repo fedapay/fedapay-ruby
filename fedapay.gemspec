@@ -5,9 +5,9 @@ require 'fedapay/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "fedapay"
-  spec.version       = Fedapay::VERSION
-  spec.authors       = ['Maelle AHOUMENOU', 'Boris Koumondji']
-  spec.email         = ['senma94@gmail.com']
+  spec.version       = FedaPay::VERSION
+  spec.authors       = ['Maelle AHOUMENOU', 'Boris Koumondji', 'Eric AKPLA']
+  spec.email         = ['senma94@gmail.com', 'kplaricos@gmail.com']
 
   spec.summary       = %q{Ruby library for FedaPay https://fedapay.com.}
   spec.description   = %q{FedaPay is the easiest way to accept mobile money payments online.}

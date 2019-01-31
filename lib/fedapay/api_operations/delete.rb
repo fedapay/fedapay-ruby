@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Stripe
+module FedaPay
   module APIOperations
     module Delete
       def delete(params = {}, opts = {})

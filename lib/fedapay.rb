@@ -1,8 +1,30 @@
-require 'openssl'
+# FedaPay Ruby bindings
+require "cgi"
+require "faraday"
+require "json"
+require "logger"
+require "openssl"
 
-require 'uba_client/errors'
-require 'uba_client/api'
-require 'uba_client/version'
+# Version
+require "fedapay/version"
+
+# API operations
+require "fedapay/api_operations/create"
+require "fedapay/api_operations/delete"
+require "fedapay/api_operations/list"
+require "fedapay/api_operations/nested_resource"
+require "fedapay/api_operations/request"
+require "fedapay/api_operations/save"
+
+# API resource support classes
+require "fedapay/errors"
+require "fedapay/util"
+require "fedapay/fedapay_client"
+require "fedapay/fedapay_object"
+require "fedapay/api_resource"
+
+# Named API resources
+require "fedapay/customer"
 
 # Module FedaPay
 module FedaPay

@@ -10,7 +10,13 @@ class FedaPayTest < Minitest::Test
     FedaPay.ca_bundle_path = old
   end
 
-  def test_unallow_max_network_retries_to_be_configured
-    assert_raises (NoMethodError) { || old = FedaPay.max_network_retries }
+  def test_allow_max_network_retries_to_be_configured
+    begin
+      old = FedaPay.max_network_retries
+      FedaPay.max_network_retries = 99
+      assert_equal 99, FedaPay.max_network_retries
+    ensure
+      FedaPay.max_network_retries = old
+    end
   end
 end

@@ -146,9 +146,22 @@ module FedaPay
         path = u.path
       end
 
+      api_key = FedaPay.api_key || FedaPay.token
+
       headers = headers.merge(default_headers)
 
-      http_resp = execute_request_with_rescues(api_base) do
+      # stores information on the request we're about to make so that we don't
+      # have to pass as many parameters around for logging.
+      context = RequestLogContext.new
+      context.account         = headers["Fedapay-Account"]
+      context.api_key         = api_key
+      context.api_version     = headers["X-Api-Version"]
+      context.body            = body
+      context.method          = method
+      context.path            = path
+      context.query_params    = query_params ? Util.encode_parameters(query_params) : nil
+
+      http_resp = execute_request_with_rescues(context) do
         conn.run_request(method, url, body, headers) do |req|
           req.options.open_timeout = FedaPay.open_timeout
           req.options.timeout = FedaPay.read_timeout
@@ -187,7 +200,7 @@ module FedaPay
       base_url + '/' + FedaPay.api_version + path
     end
 
-    def execute_request_with_rescues
+    def execute_request_with_rescues(context)
       num_retries = 0
       begin
         request_start = Time.now
@@ -313,9 +326,29 @@ module FedaPay
         'Authorization' => "Bearer #{FedaPay.api_key || FedaPay.token}"
       }
 
-      headers['FedaPay-Account'] = FedaPay.account_id if FedaPay.account_id
+      headers['Fedapay-Account'] = FedaPay.account_id if FedaPay.account_id
 
       headers
+    end
+
+    def log_response(context, request_start, status, body)
+      Util.log_info("Response from FedaPay API",
+                    account: context.account,
+                    api_version: context.api_version,
+                    elapsed: Time.now - request_start,
+                    method: context.method,
+                    path: context.path,
+                    request_id: context.request_id,
+                    status: status)
+      Util.log_debug("Response details",
+                     body: body,
+                     request_id: context.request_id)
+
+      return unless context.request_id
+
+      Util.log_debug("Dashboard link for request",
+                     request_id: context.request_id,
+                     url: Util.request_id_dashboard_url(context.request_id, context.api_key))
     end
 
     # RequestLogContext stores information about a request that's begin made so

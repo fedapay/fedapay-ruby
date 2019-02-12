@@ -1,16 +1,16 @@
 
-lib = File.expand_path("../lib", __FILE__)
+lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'fedapay/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "fedapay"
+  spec.name          = 'fedapay'
   spec.version       = FedaPay::VERSION
   spec.authors       = ['Maelle AHOUMENOU', 'Boris Koumondji', 'Eric AKPLA']
   spec.email         = ['senma94@gmail.com', 'kplaricos@gmail.com']
 
-  spec.summary       = %q{Ruby library for FedaPay https://fedapay.com.}
-  spec.description   = %q{FedaPay is the easiest way to accept mobile money payments online.}
+  spec.summary       = 'Ruby library for FedaPay https://fedapay.com.'
+  spec.description   = 'FedaPay is the easiest way to accept mobile money payments online.'
   spec.homepage      = 'https://github.com/fedapay/fedapay-ruby'
   spec.license       = 'MIT'
 
@@ -19,9 +19,9 @@ Gem::Specification.new do |spec|
   spec.files         = Dir.chdir(File.expand_path('..', __FILE__)) do
     `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   end
-  spec.bindir        = "exe"
+  spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
-  spec.require_paths = ["lib"]
+  spec.require_paths = ['lib']
 
   spec.add_dependency 'faraday'
 end

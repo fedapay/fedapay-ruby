@@ -8,16 +8,16 @@ module FedaPay
     extend FedaPay::APIOperations::List
     extend FedaPay::APIOperations::NestedResource
 
-    OBJECT_NAME = "customer".freeze
+    OBJECT_NAME = 'customer'.freeze
 
-    save_nested_resource :source
-    nested_resource_class_methods :source,
+    save_nested_resource :transaction
+    nested_resource_class_methods :transaction,
                                   operations: %i[create retrieve update delete list]
 
     # The API request for deleting a card or bank account and for detaching a
     # source object are the same.
     class << self
-      alias detach_source delete_source
+      alias detach_transaction delete_transaction
     end
   end
 end

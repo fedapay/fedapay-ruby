@@ -4,7 +4,7 @@ module FedaPay
   module APIOperations
     module Request
       module ClassMethods
-        def request(method, url, params = {}, header = {})
+        def request(method, url, params = {}, opts = {})
           opts = Util.normalize_opts(opts)
           opts[:client] ||= FedaPayClient.active_client
 

@@ -48,8 +48,8 @@ module FedaPay
 
           unless @verify_ssl_warned
             @verify_ssl_warned = true
-            $stderr.puts("WARNING: Running without SSL cert verification. " \
-              "You should never do this in production. " \
+            warn('WARNING: Running without SSL cert verification. ' \
+              'You should never do this in production. ' \
               "Execute 'FedaPay.verify_ssl_certs = true' to enable verification.")
           end
         end
@@ -114,7 +114,11 @@ module FedaPay
       end
     end
 
-    def execute_request(method, path, params: {}, headers: {})
+    def execute_request(method, path, api_base: nil, api_key: nil,
+                        params: {}, headers: {})
+
+      FedaPay.api_base = api_base if api_base
+      FedaPay.api_key = api_key if api_key
 
       params = Util.objects_to_ids(params)
       url = api_url(path)
@@ -153,12 +157,14 @@ module FedaPay
       # stores information on the request we're about to make so that we don't
       # have to pass as many parameters around for logging.
       context = RequestLogContext.new
-      context.account         = headers["Fedapay-Account"]
+      context.account         = headers['Fedapay-Account']
       context.api_key         = api_key
-      context.api_version     = headers["X-Api-Version"]
+      context.api_version     = headers['X-Api-Version']
+      context.idempotency_key = headers['Idempotency-Key']
       context.body            = body
       context.method          = method
       context.path            = path
+      context.url             = url
       context.query_params    = query_params ? Util.encode_parameters(query_params) : nil
 
       http_resp = execute_request_with_rescues(context) do
@@ -184,13 +190,13 @@ module FedaPay
 
     def base_url
       api_base = FedaPay.api_base
-      environment = FedaPay.environment;
+      environment = FedaPay.environment
 
       return api_base if api_base
 
       case environment
       when 'development', 'sandbox', 'test', nil
-        SANDBOX_BASE;
+        SANDBOX_BASE
       when 'production', 'live'
         PRODUCTION_BASE
       end
@@ -204,9 +210,15 @@ module FedaPay
       num_retries = 0
       begin
         request_start = Time.now
+        log_request(context, num_retries)
         resp = yield
         context = context.dup_from_response(resp)
         log_response(context, request_start, resp.status, resp.body)
+
+        if FedaPay.enable_telemetry? && context.request_id
+          request_duration_ms = ((Time.now - request_start) * 1000).to_int
+          @last_request_metrics = FedaPayRequestMetrics.new(context.request_id, request_duration_ms)
+        end
 
       # We rescue all exceptions from a request so that we have an easy spot to
       # implement our retry logic across the board. We'll re-raise if it's a type
@@ -215,6 +227,14 @@ module FedaPay
         # If we modify context we copy it into a new variable so as not to
         # taint the original on a retry.
         error_context = context
+
+        if e.respond_to?(:response) && e.response
+          error_context = context.dup_from_response(e.response)
+          log_response(error_context, request_start,
+                       e.response[:status], e.response[:body])
+        else
+          log_response_error(error_context, request_start, e)
+        end
 
         if self.class.should_retry?(e, num_retries)
           num_retries += 1
@@ -251,12 +271,12 @@ module FedaPay
         resp = FedaPayResponse.from_faraday_hash(http_resp)
         error_data = resp.data[:error]
 
-        raise FedaPayError, "Indeterminate error" unless error_data
+        raise FedaPayError, 'Indeterminate error' unless error_data
       rescue JSON::ParserError, FedaPayError
         raise general_api_error(http_resp[:status], http_resp[:body])
       end
 
-      error = specific_api_error(resp, error_data, context)
+      error = specific_api_error(resp, error_data)
       error.response = resp
 
       raise(error)
@@ -270,7 +290,7 @@ module FedaPay
         http_headers: resp.http_headers,
         http_status: resp.http_status,
         json_body: resp.data,
-        code: error_data[:code],
+        code: error_data[:code]
       }
 
       case resp.http_status
@@ -287,29 +307,29 @@ module FedaPay
     end
 
     def handle_network_error(e, num_retries)
-      Util.log_error("FedaPay network error", error_message: e.message)
+      Util.log_error('FedaPay network error', error_message: e.message)
 
       case e
       when Faraday::ConnectionFailed
-        message = "Unexpected error communicating when trying to connect to FedaPay. " \
-          "You may be seeing this message because your DNS is not working. " \
+        message = 'Unexpected error communicating when trying to connect to FedaPay. ' \
+          'You may be seeing this message because your DNS is not working. ' \
           "To check, try running 'host fedapay.com' from the command line."
 
       when Faraday::SSLError
-        message = "Could not establish a secure connection to FedaPay, you may " \
-                  "need to upgrade your OpenSSL version. To check, try running " \
+        message = 'Could not establish a secure connection to FedaPay, you may ' \
+                  'need to upgrade your OpenSSL version. To check, try running ' \
                   "'openssl s_client -connect api.fedapay.com:443' from the " \
-                  "command line."
+                  'command line.'
 
       when Faraday::TimeoutError
         message = "Could not connect to FedaPay (#{FedaPay.api_base}). " \
-          "Please check your internet connection and try again. " \
+          'Please check your internet connection and try again. ' \
           "If this problem persists, you should check FedaPay's service status at " \
-          "https://twitter.com/fedapaystatus, or let us know at support@fedapay.com."
+          'https://twitter.com/fedapaystatus, or let us know at support@fedapay.com.'
 
       else
-        message = "Unexpected error communicating with FedaPay. " \
-          "If this problem persists, let us know at support@fedapay.com."
+        message = 'Unexpected error communicating with FedaPay. ' \
+          'If this problem persists, let us know at support@fedapay.com.'
 
       end
 
@@ -331,8 +351,21 @@ module FedaPay
       headers
     end
 
+    def log_request(context, num_retries)
+      Util.log_info('Request to FedaPay API',
+                    account: context.account,
+                    api_version: context.api_version,
+                    method: context.method,
+                    num_retries: num_retries,
+                    url: context.url,
+                    path: context.path)
+      Util.log_debug('Request details',
+                     body: context.body,
+                     query_params: context.query_params)
+    end
+
     def log_response(context, request_start, status, body)
-      Util.log_info("Response from FedaPay API",
+      Util.log_info('Response from FedaPay API',
                     account: context.account,
                     api_version: context.api_version,
                     elapsed: Time.now - request_start,
@@ -340,15 +373,23 @@ module FedaPay
                     path: context.path,
                     request_id: context.request_id,
                     status: status)
-      Util.log_debug("Response details",
+      Util.log_debug('Response details',
                      body: body,
                      request_id: context.request_id)
 
       return unless context.request_id
 
-      Util.log_debug("Dashboard link for request",
+      Util.log_debug('Dashboard link for request',
                      request_id: context.request_id,
                      url: Util.request_id_dashboard_url(context.request_id, context.api_key))
+    end
+
+    def log_response_error(context, request_start, e)
+      Util.log_error('Request error',
+                     elapsed: Time.now - request_start,
+                     error_message: e.message,
+                     method: context.method,
+                     path: context.path)
     end
 
     # RequestLogContext stores information about a request that's begin made so
@@ -362,6 +403,7 @@ module FedaPay
       attr_accessor :idempotency_key
       attr_accessor :method
       attr_accessor :path
+      attr_accessor :url
       attr_accessor :query_params
       attr_accessor :request_id
 
@@ -384,10 +426,10 @@ module FedaPay
                   end
 
         context = dup
-        context.account = headers["FedaPay-Account"]
-        context.api_version = headers["FedaPay-Version"]
-        context.idempotency_key = headers["Idempotency-Key"]
-        context.request_id = headers["Request-Id"]
+        context.account = headers['Fedapay-Account']
+        context.api_version = headers['X-Api-Version']
+        context.idempotency_key = headers['Idempotency-Key']
+        context.request_id = headers['Request-Id']
         context
       end
     end
@@ -397,34 +439,34 @@ module FedaPay
     # integrations.
     class SystemProfiler
       def self.uname
-        if ::File.exist?("/proc/version")
-          ::File.read("/proc/version").strip
+        if ::File.exist?('/proc/version')
+          ::File.read('/proc/version').strip
         else
-          case RbConfig::CONFIG["host_os"]
+          case RbConfig::CONFIG['host_os']
           when /linux|darwin|bsd|sunos|solaris|cygwin/i
             uname_from_system
           when /mswin|mingw/i
             uname_from_system_ver
           else
-            "unknown platform"
+            'unknown platform'
           end
         end
       end
 
       def self.uname_from_system
-        (`uname -a 2>/dev/null` || "").strip
+        (`uname -a 2>/dev/null` || '').strip
       rescue Errno::ENOENT
-        "uname executable not found"
+        'uname executable not found'
       rescue Errno::ENOMEM # couldn't create subprocess
-        "uname lookup failed"
+        'uname lookup failed'
       end
 
       def self.uname_from_system_ver
-        (`ver` || "").strip
+        (`ver` || '').strip
       rescue Errno::ENOENT
-        "ver executable not found"
+        'ver executable not found'
       rescue Errno::ENOMEM # couldn't create subprocess
-        "uname lookup failed"
+        'uname lookup failed'
       end
 
       def initialize
@@ -437,14 +479,32 @@ module FedaPay
         {
           application: FedaPay.app_info,
           bindings_version: FedaPay::VERSION,
-          lang: "ruby",
+          lang: 'ruby',
           lang_version: lang_version,
           platform: RUBY_PLATFORM,
-          engine: defined?(RUBY_ENGINE) ? RUBY_ENGINE : "",
-          publisher: "fedapay",
+          engine: defined?(RUBY_ENGINE) ? RUBY_ENGINE : '',
+          publisher: 'fedapay',
           uname: @uname,
-          hostname: Socket.gethostname,
+          hostname: Socket.gethostname
         }.delete_if { |_k, v| v.nil? }
+      end
+    end
+
+    # FedaPayRequestMetrics tracks metadata to be reported to stripe for metrics collection
+    class FedaPayRequestMetrics
+      # The FedaPay request ID of the response.
+      attr_accessor :request_id
+
+      # Request duration in milliseconds
+      attr_accessor :request_duration_ms
+
+      def initialize(request_id, request_duration_ms)
+        self.request_id = request_id
+        self.request_duration_ms = request_duration_ms
+      end
+
+      def payload
+        { request_id: request_id, request_duration_ms: request_duration_ms }
       end
     end
   end

@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
-require "bundler/setup"
-require "fedapay/ruby"
+require 'bundler/setup'
 
 # You can add fixtures and/or initialization code here to make experimenting
 # with your gem easier. You can also use a different console, if you like.
@@ -10,5 +9,15 @@ require "fedapay/ruby"
 # require "pry"
 # Pry.start
 
-require "irb"
-IRB.start(__FILE__)
+require 'irb'
+require 'irb/completion'
+
+require ::File.expand_path('../../lib/fedapay', __FILE__)
+
+# Config IRB to enable --simple-prompt and auto indent
+IRB.conf[:PROMPT_MODE] = :SIMPLE
+IRB.conf[:AUTO_INDENT] = true
+
+puts "Loaded gem 'fedapay'"
+
+IRB.start

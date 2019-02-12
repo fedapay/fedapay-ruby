@@ -1,31 +1,39 @@
 # FedaPay Ruby bindings
-require "cgi"
-require "faraday"
-require "json"
-require "logger"
-require "openssl"
+require 'cgi'
+require 'faraday'
+require 'json'
+require 'logger'
+require 'openssl'
 
 # Version
-require "fedapay/version"
+require 'fedapay/version'
 
 # API operations
-require "fedapay/api_operations/create"
-require "fedapay/api_operations/delete"
-require "fedapay/api_operations/list"
-require "fedapay/api_operations/nested_resource"
-require "fedapay/api_operations/request"
-require "fedapay/api_operations/save"
+require 'fedapay/api_operations/create'
+require 'fedapay/api_operations/delete'
+require 'fedapay/api_operations/list'
+require 'fedapay/api_operations/nested_resource'
+require 'fedapay/api_operations/request'
+require 'fedapay/api_operations/save'
 
 # API resource support classes
-require "fedapay/errors"
-require "fedapay/util"
-require "fedapay/fedapay_client"
-require "fedapay/fedapay_object"
-require "fedapay/fedapay_response"
-require "fedapay/api_resource"
+require 'fedapay/errors'
+require 'fedapay/util'
+require 'fedapay/fedapay_client'
+require 'fedapay/fedapay_object'
+require 'fedapay/fedapay_response'
+require 'fedapay/list_object'
+require 'fedapay/api_resource'
 
 # Named API resources
-require "fedapay/customer"
+require 'fedapay/account'
+require 'fedapay/api_key'
+require 'fedapay/currency'
+require 'fedapay/customer'
+require 'fedapay/event'
+require 'fedapay/log'
+require 'fedapay/payout'
+require 'fedapay/transaction'
 
 # Module FedaPay
 module FedaPay
@@ -45,12 +53,14 @@ module FedaPay
   @max_network_retry_delay = 2
   @initial_network_retry_delay = 0.5
 
-  @open_timeout = 30
-  @read_timeout = 80
+  @open_timeout = 200
+  @read_timeout = 200
 
   @ca_store = nil
   @verify_ssl_certs = true
   @ca_bundle_path = DEFAULT_CA_BUNDLE_PATH
+
+  @enable_telemetry = false
 
   LEVEL_DEBUG = Logger::DEBUG
   LEVEL_ERROR = Logger::ERROR
@@ -59,7 +69,7 @@ module FedaPay
   class << self
     attr_accessor :debug, :logger, :api_base, :api_key, :token, :account_id,
                   :environment, :api_version, :verify_ssl_certs,
-                  :open_timeout, :read_timeout
+                  :open_timeout, :read_timeout, :max_network_retries
 
     attr_reader :ca_bundle_path, :max_network_retry_delay, :initial_network_retry_delay
 
@@ -92,14 +102,14 @@ module FedaPay
 
   def self.log_level=(val)
     # Backwards compatibility for values that we briefly allowed
-    if val == "debug"
+    if val == 'debug'
       val = LEVEL_DEBUG
-    elsif val == "info"
+    elsif val == 'info'
       val = LEVEL_INFO
     end
 
     if !val.nil? && ![LEVEL_DEBUG, LEVEL_ERROR, LEVEL_INFO].include?(val)
-      raise ArgumentError, "log_level should only be set to `nil`, `debug` or `info`"
+      raise ArgumentError, 'log_level should only be set to `nil`, `debug` or `info`'
     end
     @log_level = val
   end
@@ -127,11 +137,11 @@ module FedaPay
     @max_network_retries = val.to_i
   end
 
-  def self.max_network_retries
-    @max_network_retries
+  def self.enable_telemetry?
+    @enable_telemetry
   end
 
-  def self.max_network_retries=(val)
-    @max_network_retries = val.to_i
+  def self.enable_telemetry=(val)
+    @enable_telemetry = val
   end
 end

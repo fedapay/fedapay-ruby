@@ -48,6 +48,7 @@ GEM
       unicode-display_width (~> 1.0, >= 1.0.1)
     ruby-progressbar (1.10.0)
     safe_yaml (1.0.4)
+    timecop (0.9.1)
     unicode-display_width (1.4.0)
     webmock (3.5.1)
       addressable (>= 2.3.6)
@@ -66,6 +67,7 @@ DEPENDENCIES
   mocha (~> 0.13.2)
   rake (~> 10.0)
   rubocop (= 0.52.1)
+  timecop
   webmock
 
 BUNDLED WITH

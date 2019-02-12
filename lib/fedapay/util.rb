@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "cgi"
+require 'cgi'
 
 module FedaPay
   module Util
@@ -39,11 +39,14 @@ module FedaPay
       end
     end
 
-    def self.object_classes # rubocop:disable Metrics/MethodLength
+    def self.object_classes
       @object_classes ||= {
         # data structures
         ListObject::OBJECT_NAME => ListObject,
         Customer::OBJECT_NAME => Customer,
+        Customer.resource_object_name => Customer,
+        Account::OBJECT_NAME => Account,
+        Account.resource_object_name => Account
       }
     end
 
@@ -64,8 +67,10 @@ module FedaPay
       when Array
         data.map { |i| convert_to_fedapay_object(i, opts) }
       when Hash
-        # Try converting to a known object class.  If none available, fall back to generic FedaPayObject
-        object_classes.fetch(data[:object], FedaPayObject).construct_from(data, opts)
+        # Try converting to a known klass class.  If none available, fall back to generic FedaPayObject
+        object = object_classes.fetch(data[:klass], FedaPayObject)
+
+        object.construct_from(data, opts)
       else
         data
       end
@@ -121,7 +126,7 @@ module FedaPay
     # `&`).
     def self.encode_parameters(params)
       Util.flatten_params(params)
-          .map { |k, v| "#{url_encode(k)}=#{url_encode(v)}" }.join("&")
+          .map { |k, v| "#{url_encode(k)}=#{url_encode(v)}" }.join('&')
     end
 
     # Encodes a string in a way that makes it suitable for use in a set of
@@ -132,7 +137,7 @@ module FedaPay
         # Don't use strict form encoding by changing the square bracket control
         # characters back to their literals. This is fine by the server, and
         # makes these parameter strings easier to read.
-        gsub("%5B", "[").gsub("%5D", "]")
+        gsub('%5B', '[').gsub('%5D', ']')
     end
 
     def self.flatten_params(params, parent_key = nil)
@@ -188,17 +193,17 @@ module FedaPay
         check_api_key!(opts.fetch(:api_key)) if opts.key?(:api_key)
         opts.clone
       else
-        raise TypeError, "normalize_opts expects a string or a hash"
+        raise TypeError, 'normalize_opts expects a string or a hash'
       end
     end
 
     def self.check_string_argument!(key)
-      raise TypeError, "argument must be a string" unless key.is_a?(String)
+      raise TypeError, 'argument must be a string' unless key.is_a?(String)
       key
     end
 
     def self.check_api_key!(key)
-      raise TypeError, "api_key must be a string" unless key.is_a?(String)
+      raise TypeError, 'api_key must be a string' unless key.is_a?(String)
       key
     end
 
@@ -206,7 +211,7 @@ module FedaPay
     # ID value and an API key, which is used to attempt to extract whether the
     # environment is livemode or testmode.
     def self.request_id_dashboard_url(request_id, api_key)
-      env = !api_key.nil? && api_key.start_with?("sk_live") ? "live" : "test"
+      env = !api_key.nil? && api_key.start_with?('sk_live') ? 'live' : 'test'
       "https://dashboard.fedapay.com/#{env}/logs/#{request_id}"
     end
 
@@ -235,7 +240,7 @@ module FedaPay
       magenta: 5, light_magenta: 65,
       cyan:    6, light_cyan:    66,
       white:   7, light_white:   67,
-      default: 9,
+      default: 9
     }.freeze
     private_constant :COLOR_CODES
 
@@ -255,9 +260,9 @@ module FedaPay
     # Turns an integer log level into a printable name.
     def self.level_name(level)
       case level
-      when LEVEL_DEBUG then "debug"
-      when LEVEL_ERROR then "error"
-      when LEVEL_INFO  then "info"
+      when LEVEL_DEBUG then 'debug'
+      when LEVEL_ERROR then 'error'
+      when LEVEL_INFO  then 'info'
       else level
       end
     end
@@ -268,18 +273,18 @@ module FedaPay
     def self.log_internal(message, data = {}, color: nil, level: nil, logger: nil, out: nil)
       data_str = data.reject { |_k, v| v.nil? }
                      .map do |(k, v)|
-        format("%s=%s", colorize(k, color, logger.nil? && !out.nil? && out.isatty), wrap_logfmt_value(v))
-      end.join(" ")
+        format('%s=%s', colorize(k, color, logger.nil? && !out.nil? && out.isatty), wrap_logfmt_value(v))
+      end.join(' ')
 
       if !logger.nil?
         # the library's log levels are mapped to the same values as the
         # standard library's logger
         logger.log(level,
-                   format("message=%s %s", wrap_logfmt_value(message), data_str))
+                   format('message=%s %s', wrap_logfmt_value(message), data_str))
       elsif out.isatty
-        out.puts format("%s %s %s", colorize(level_name(level)[0, 4].upcase, color, out.isatty), message, data_str)
+        out.puts format('%s %s %s', colorize(level_name(level)[0, 4].upcase, color, out.isatty), message, data_str)
       else
-        out.puts format("message=%s level=%s %s", wrap_logfmt_value(message), level_name(level), data_str)
+        out.puts format('message=%s level=%s %s', wrap_logfmt_value(message), level_name(level), data_str)
       end
     end
     private_class_method :log_internal

@@ -12,16 +12,24 @@ module FedaPay
     attr_accessor :save_with_parent
 
     def self.class_name
-      name.split("::")[-1]
+      name.split('::')[-1]
     end
 
     def self.resource_url
       if self == APIResource
-        raise NotImplementedError, "APIResource is an abstract class.  You should perform actions on its subclasses (Charge, Customer, etc.)"
+        raise NotImplementedError, 'APIResource is an abstract class.  You should perform actions on its subclasses (Charge, Customer, etc.)'
       end
       # Namespaces are separated in object names with periods (.) and in URLs
       # with forward slashes (/), so replace the former with the latter.
-      "/v1/#{self::OBJECT_NAME.downcase.tr('.', '/')}s"
+      "/#{self::OBJECT_NAME.downcase.tr('.', '/')}s"
+    end
+
+    def self.resource_object_name
+      if self == APIResource
+        raise NotImplementedError, 'APIResource is an abstract class.  You should perform actions on its subclasses (Charge, Customer, etc.)'
+      end
+
+      "#{FedaPay.api_version}/#{self::OBJECT_NAME.downcase}"
     end
 
     # A metaprogramming call that specifies that a field of a resource can be
@@ -49,8 +57,8 @@ module FedaPay
     end
 
     def resource_url
-      unless (id = self["id"])
-        raise InvalidRequestError.new("Could not determine which URL to request: #{self.class} instance has invalid ID: #{id.inspect}", "id")
+      unless (id = self['id'])
+        raise InvalidRequestError.new("Could not determine which URL to request: #{self.class} instance has invalid ID: #{id.inspect}", 'id')
       end
       "#{self.class.resource_url}/#{CGI.escape(id)}"
     end

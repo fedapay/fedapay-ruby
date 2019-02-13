@@ -63,9 +63,13 @@ module FedaPay
       "#{self.class.resource_url}/#{CGI.escape(id)}"
     end
 
+    def resource_object_name
+      "#{self.class.resource_object_name}".to_sym
+    end
+
     def refresh
       resp, opts = request(:get, resource_url, @retrieve_params)
-      initialize_from(resp.data, opts)
+      initialize_from(resp.data[resource_object_name], opts)
     end
 
     def self.retrieve(id, opts = {})

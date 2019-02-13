@@ -70,7 +70,7 @@ module FedaPay
 
     def self.retrieve(id, opts = {})
       opts = Util.normalize_opts(opts)
-      instance = new(id, opts)
+      instance = new(id.to_s, opts)
       instance.refresh
       instance
     end

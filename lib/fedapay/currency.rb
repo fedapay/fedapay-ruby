@@ -6,13 +6,5 @@ module FedaPay
     extend FedaPay::APIOperations::NestedResource
 
     OBJECT_NAME = 'currency'.freeze
-
-    def resource_url
-      if self['id']
-        super
-      else
-        '/currencies'
-      end
-    end
   end
 end

@@ -5,9 +5,14 @@ module FedaPay
     module List
       def list(filters = {}, opts = {})
         opts = Util.normalize_opts(opts)
-
         resp, opts = request(:get, resource_url, filters, opts)
-        obj = ListObject.construct_from(resp.data, opts)
+
+        if self.respond_to?(:resource_object_name)
+          resp = resp.data[self.resource_object_name.pluralize.to_sym]
+          resp = { data: { data: resp} }
+        end
+
+        obj = ListObject.construct_from(resp[:data], opts)
 
         # set filters so that we can fetch the same limit, expansions, and
         # predicates when accessing the next and previous pages

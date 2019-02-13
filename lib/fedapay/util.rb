@@ -43,10 +43,22 @@ module FedaPay
       @object_classes ||= {
         # data structures
         ListObject::OBJECT_NAME => ListObject,
+        Account::OBJECT_NAME => Account,
+        Account.resource_object_name => Account,
+        ApiKey::OBJECT_NAME => ApiKey,
+        ApiKey.resource_object_name => ApiKey,
+        Currency::OBJECT_NAME => Currency,
+        Currency.resource_object_name => Currency,
         Customer::OBJECT_NAME => Customer,
         Customer.resource_object_name => Customer,
-        Account::OBJECT_NAME => Account,
-        Account.resource_object_name => Account
+        Event::OBJECT_NAME => Event,
+        Event.resource_object_name => Event,
+        Log::OBJECT_NAME => Log,
+        Log.resource_object_name => Log,
+        Payout::OBJECT_NAME => Payout,
+        Payout.resource_object_name => Payout,
+        Transaction::OBJECT_NAME => Transaction,
+        Transaction.resource_object_name => Transaction
       }
     end
 

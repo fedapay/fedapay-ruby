@@ -23,8 +23,14 @@ module FedaPay
             end
           end
 
-          resp, opts = request(:post, "#{resource_url}/#{id}", params, opts)
-          Util.convert_to_stripe_object(resp.data, opts)
+          resp, opts = request(:put, "#{resource_url}/#{id}", params, opts)
+
+          if self.respond_to?(:resource_object_name)
+            resp = resp.data[self.resource_object_name.to_sym]
+            resp = { data: resp }
+          end
+
+          Util.convert_to_stripe_object(resp[:data], opts)
         end
       end
 
@@ -59,8 +65,14 @@ module FedaPay
         # generated a uri for this object with an identifier baked in
         values.delete(:id)
 
-        resp, opts = request(:post, save_url, values, opts)
-        initialize_from(resp.data, opts)
+        resp, opts = request(:put, save_url, values, opts)
+
+        if self.respond_to?(:resource_object_name)
+          resp = resp.data[self.resource_object_name.to_sym]
+          resp = { data: resp }
+        end
+
+        initialize_from(resp[:data], opts)
       end
 
       def self.included(base)

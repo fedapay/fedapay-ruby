@@ -4,6 +4,6 @@ module FedaPay
   class Log < APIResource
     extend FedaPay::APIOperations::List
 
-    OBJECT_NAME = 'event'.freeze
+    OBJECT_NAME = 'log'.freeze
   end
 end

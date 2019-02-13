@@ -21,7 +21,7 @@ module FedaPay
       end
       # Namespaces are separated in object names with periods (.) and in URLs
       # with forward slashes (/), so replace the former with the latter.
-      "/#{self::OBJECT_NAME.downcase.tr('.', '/')}s"
+      "/#{self::OBJECT_NAME.downcase.tr('.', '/')}".pluralize
     end
 
     def self.resource_object_name
@@ -60,7 +60,7 @@ module FedaPay
       unless (id = self['id'])
         raise InvalidRequestError.new("Could not determine which URL to request: #{self.class} instance has invalid ID: #{id.inspect}", 'id')
       end
-      "#{self.class.resource_url}/#{CGI.escape(id)}"
+      "#{self.class.resource_url}/#{CGI.escape(id.to_s)}"
     end
 
     def resource_object_name

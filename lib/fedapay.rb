@@ -4,6 +4,7 @@ require 'faraday'
 require 'json'
 require 'logger'
 require 'openssl'
+require 'active_support/inflector'
 
 # Version
 require 'fedapay/version'

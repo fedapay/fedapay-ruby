@@ -1,5 +1,6 @@
 # FedaPay Ruby bindings
 require 'cgi'
+require 'date'
 require 'faraday'
 require 'json'
 require 'logger'

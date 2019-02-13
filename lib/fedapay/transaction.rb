@@ -11,7 +11,7 @@ module FedaPay
     OBJECT_NAME = 'transaction'.freeze
 
     def generate_token
-      url = "#{resource_url}/token" 
+      url = "#{resource_url}/token"
       resp, opts = request(:post, url, @retrieve_params)
 
       Util.convert_to_fedapay_object(resp.data, opts)

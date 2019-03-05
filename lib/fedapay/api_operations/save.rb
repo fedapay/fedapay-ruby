@@ -30,7 +30,7 @@ module FedaPay
             resp = { data: resp }
           end
 
-          Util.convert_to_stripe_object(resp[:data], opts)
+          Util.convert_to_fedapay_object(resp[:data], opts)
         end
       end
 

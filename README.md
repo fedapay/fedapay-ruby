@@ -8,7 +8,7 @@ TODO: Delete this and the text above, and describe your gem
 
 Add this line to your application's Gemfile:
 
-```ruby
+``` ruby
 gem 'fedapay-ruby'
 ```
 
@@ -22,7 +22,104 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+``` ruby
+require fedapay
+
+# configure FedaPay library
+FedaPay.api_key = '' # Your secret api key
+FedaPay.environment = '' # sandbox or live
+```
+
+## Customer operations
+
+``` ruby
+# customers list
+customers = FedaPay::Customer.list
+
+# get a customer by id
+customer = FedaPay::Customer.retrieve 1
+
+# create a customer
+phone = {
+  country: 'bj',
+  number: '66000001'
+}
+
+customer = FedaPay::Customer.create firstname: 'firstname', lastname: 'lastname',
+                                    email: 'email@test.com', phone_number: phone
+
+# update a customer instance
+customer.firstname = 'My Firstname'
+customer.save
+
+# or
+customer.save fistname: 'My Firstname', lastname: 'My Lastname'
+
+# Update a customer by id
+customer = FedaPay::Customer.update 202, email: 'myemail@test.com'
+
+# Delete a customer by instance
+customer.delete
+```
+
+## Transaction operations
+``` ruby
+# transactions list
+transactions = FedaPay::Transaction.list
+
+# Get a transaction
+transaction = FedaPay::Transaction.retrieve 2
+
+# Create a transaction with existing customer instance
+currencies = FedaPay::Currency.list
+customer = FedaPay::Customer.retrieve 2
+
+transaction = FedaPay::Transaction.create amount: 1000, currency: currencies.first.to_hash, customer = customer.to_hash, description: ''
+
+# Create a transaction with existing customer by id or email
+customer = {
+  id: 1, # Or email
+  email: 'customer@test.com'
+}
+
+currency = {
+  iso: 'XOF', # Or code,
+  code: '952'
+}
+
+transaction = FedaPay::Transaction.create amount: 1000, currency: currencies, customer = customer, description: ''
+
+# New customer can also be created when creating a transaction
+customer = {
+  email: 'customer@test.com',
+  firstname: 'New firstname',
+  lastname: 'New Lastname'
+}
+...
+
+# Update a transaction instance
+transaction.amount = 5000
+transaction.save
+
+# Or
+
+transaction.save amount: 5000
+
+# Update a transaction by id
+FedaPay.update 2, amount: 5000
+
+# Delete a transaction
+transaction.delete
+
+# Generate a secured payment link for a transaction or get it token
+data = transaction.generate_token
+
+# data structure is :
+# {
+#   token: '',
+#   url: 'https://...'
+# }
+```
 
 ## Development
 

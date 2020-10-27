@@ -23,7 +23,7 @@ module FedaPay
       unless mode_available(mode)
         raise ArgumentError, "Invalid payment method '#{mode}' supplied. " \
                 'You have to use one of the following payment methods ' \
-                "[#{available_mobile_money.join(', ')}]"
+                "[#{@@available_mobile_money.join(', ')}]"
       end
 
       url = '/' + mode

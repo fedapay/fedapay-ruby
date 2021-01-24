@@ -11,7 +11,7 @@ group :development do
   gem 'minitest', '~> 5.0'
   gem 'minitest-reporters'
   gem 'mocha', '~> 0.13.2'
-  gem 'rake', '~> 10.0'
+  gem 'rake', '>= 12.3.3'
   gem 'rubocop', '0.52.1'
   gem 'timecop'
   gem 'webmock'

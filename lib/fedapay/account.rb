@@ -7,7 +7,6 @@ module FedaPay
     extend FedaPay::APIOperations::List
     include FedaPay::APIOperations::Delete
     include FedaPay::APIOperations::Save
-    extend FedaPay::APIOperations::NestedResource
 
     OBJECT_NAME = 'account'.freeze
 

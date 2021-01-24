@@ -9,10 +9,6 @@ module FedaPay
 
     OBJECT_NAME = 'customer'.freeze
 
-    save_nested_resource :transaction
-    nested_resource_class_methods :transaction,
-                                  operations: %i[create retrieve update delete list]
-
     # The API request for deleting a card or bank account and for detaching a
     # source object are the same.
     class << self

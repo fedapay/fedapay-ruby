@@ -490,7 +490,7 @@ module FedaPay
       end
     end
 
-    # FedaPayRequestMetrics tracks metadata to be reported to stripe for metrics collection
+    # FedaPayRequestMetrics tracks metadata to be reported to fedapay for metrics collection
     class FedaPayRequestMetrics
       # The FedaPay request ID of the response.
       attr_accessor :request_id

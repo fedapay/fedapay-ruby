@@ -80,8 +80,7 @@ module FedaPay
     end
 
     def start(params = {}, opts = {})
-      base_url = "/#{OBJECT_NAME.downcase.tr('.', '/')}".pluralize 
-      url = "#{base_url}/start"
+      url = "#{self.class.ressource_url}/start"
 
       resp, opts = request(:put, url, params, opts)
 

@@ -14,7 +14,6 @@ module FedaPay
           client = headers.delete(:client)
           # Assume all remaining opts must be headers
 
-          p "test", params
           resp, opts[:api_key] = client.execute_request(
             method, url,
             api_base: api_base, api_key: api_key,

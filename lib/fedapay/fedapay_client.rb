@@ -121,7 +121,6 @@ module FedaPay
       FedaPay.api_key = api_key if api_key
 
       params = Util.objects_to_ids(params)
-      p "ici", Util.encode_parameters(params)
       url = api_url(path)
 
       body = nil

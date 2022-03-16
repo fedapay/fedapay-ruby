@@ -175,7 +175,7 @@ module FedaPay
       result = []
       value.each_with_index do |elem, i|
         if elem.is_a?(Hash)
-          result += flatten_params(elem, "#{calculated_key}[#{i}]")
+          result += flatten_params(elem, "#{calculated_key}[]")
         elsif elem.is_a?(Array)
           result += flatten_params_array(elem, calculated_key)
         else

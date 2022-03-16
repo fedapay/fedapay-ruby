@@ -179,7 +179,7 @@ module FedaPay
         elsif elem.is_a?(Array)
           result += flatten_params_array(elem, calculated_key)
         else
-          result << ["#{calculated_key}[#{i}]", elem]
+          result << ["#{calculated_key}[]", elem]
         end
       end
       result

@@ -20,7 +20,6 @@ module FedaPay
         ]
       }.merge(params)
 
-      p params
       start(params, opts)
     end
 

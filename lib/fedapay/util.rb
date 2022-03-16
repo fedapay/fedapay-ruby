@@ -173,6 +173,8 @@ module FedaPay
 
     def self.flatten_params_array(value, calculated_key)
       result = []
+      p "*****************************"
+      p "value", value, "calculated_key", calculated_key
       value.each_with_index do |elem, i|
         if elem.is_a?(Hash)
           result += flatten_params(elem, "#{calculated_key}[]")

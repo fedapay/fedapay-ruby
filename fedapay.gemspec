@@ -1,28 +1,34 @@
+# -*- encoding: utf-8 -*-
+# stub: fedapay 0.1.16 ruby lib
 
-lib = File.expand_path('../lib', __FILE__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'fedapay/version'
+Gem::Specification.new do |s|
+  s.name = "fedapay".freeze
+  s.version = "0.1.16"
 
-Gem::Specification.new do |spec|
-  spec.name          = 'fedapay'
-  spec.version       = FedaPay::VERSION
-  spec.authors       = ['Maelle AHOUMENOU', 'Boris Koumondji', 'Eric AKPLA']
-  spec.email         = ['senma94@gmail.com', 'kplaricos@gmail.com']
+  s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
+  s.require_paths = ["lib".freeze]
+  s.authors = ["Maelle AHOUMENOU".freeze, "Boris Koumondji".freeze, "Eric AKPLA".freeze]
+  s.bindir = "exe".freeze
+  s.date = "2022-04-27"
+  s.description = "FedaPay is the easiest way to accept mobile money payments online.".freeze
+  s.email = ["senma94@gmail.com".freeze, "kplaricos@gmail.com".freeze]
+  s.files = [".editorconfig".freeze, ".gitignore".freeze, ".travis.yml".freeze, "CODE_OF_CONDUCT.md".freeze, "Gemfile".freeze, "LICENSE.txt".freeze, "README.md".freeze, "Rakefile".freeze, "bin/console".freeze, "bin/setup".freeze, "fedapay.gemspec".freeze, "lib/data/ca-certificates.crt".freeze, "lib/fedapay.rb".freeze, "lib/fedapay/account.rb".freeze, "lib/fedapay/api_key.rb".freeze, "lib/fedapay/api_operations/create.rb".freeze, "lib/fedapay/api_operations/delete.rb".freeze, "lib/fedapay/api_operations/list.rb".freeze, "lib/fedapay/api_operations/request.rb".freeze, "lib/fedapay/api_operations/save.rb".freeze, "lib/fedapay/api_resource.rb".freeze, "lib/fedapay/currency.rb".freeze, "lib/fedapay/customer.rb".freeze, "lib/fedapay/errors.rb".freeze, "lib/fedapay/event.rb".freeze, "lib/fedapay/fedapay_client.rb".freeze, "lib/fedapay/fedapay_object.rb".freeze, "lib/fedapay/fedapay_response.rb".freeze, "lib/fedapay/list_object.rb".freeze, "lib/fedapay/log.rb".freeze, "lib/fedapay/page.rb".freeze, "lib/fedapay/payout.rb".freeze, "lib/fedapay/transaction.rb".freeze, "lib/fedapay/util.rb".freeze, "lib/fedapay/version.rb".freeze, "lib/fedapay/webhook.rb".freeze, "lib/fedapay/webhook_signature.rb".freeze]
+  s.homepage = "https://github.com/fedapay/fedapay-ruby".freeze
+  s.licenses = ["MIT".freeze]
+  s.rubygems_version = "3.1.6".freeze
+  s.summary = "Ruby library for FedaPay https://fedapay.com.".freeze
 
-  spec.summary       = 'Ruby library for FedaPay https://fedapay.com.'
-  spec.description   = 'FedaPay is the easiest way to accept mobile money payments online.'
-  spec.homepage      = 'https://github.com/fedapay/fedapay-ruby'
-  spec.license       = 'MIT'
+  s.installed_by_version = "3.1.6" if s.respond_to? :installed_by_version
 
-  # Specify which files should be added to the gem when it is released.
-  # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
-  spec.files         = Dir.chdir(File.expand_path('..', __FILE__)) do
-    `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  if s.respond_to? :specification_version then
+    s.specification_version = 4
   end
-  spec.bindir        = 'exe'
-  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
-  spec.require_paths = ['lib']
 
-  spec.add_dependency 'faraday'
-  spec.add_dependency 'activesupport'
+  if s.respond_to? :add_runtime_dependency then
+    s.add_runtime_dependency(%q<faraday>.freeze, [">= 0"])
+    s.add_runtime_dependency(%q<activesupport>.freeze, [">= 0"])
+  else
+    s.add_dependency(%q<faraday>.freeze, [">= 0"])
+    s.add_dependency(%q<activesupport>.freeze, [">= 0"])
+  end
 end

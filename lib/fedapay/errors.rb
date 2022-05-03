@@ -54,6 +54,15 @@ module FedaPay
   class APIError < FedaPayError
   end
 
+  class SignatureVerificationError < FedaPayError
+    attr_accessor :sigHeader
+
+    def initialize(message, sigHeader, http_body: nil)
+      super(message, http_body: http_body)
+      @sigHeader = sigHeader
+    end
+  end
+
   # InvalidRequestError is raised when a request is initiated with invalid
   # parameters.
   class InvalidRequestError < FedaPayError

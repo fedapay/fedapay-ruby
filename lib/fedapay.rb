@@ -35,6 +35,8 @@ require 'fedapay/event'
 require 'fedapay/log'
 require 'fedapay/payout'
 require 'fedapay/transaction'
+require 'fedapay/webhook'
+require 'fedapay/webhook_signature'
 
 # Module FedaPay
 module FedaPay

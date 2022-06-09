@@ -6,6 +6,7 @@ module FedaPay
     extend FedaPay::APIOperations::Create
     extend FedaPay::APIOperations::Delete
     extend FedaPay::APIOperations::Save
+    extend FedaPay::APIOperations::Search
 
     OBJECT_NAME = 'payout'.freeze
 
@@ -16,7 +17,7 @@ module FedaPay
         )
       end
 
-      params = { payouts: [ { id: id } ] }.merge(params)
+      params = { payouts: [{ id: id }] }.merge(params)
 
       start(params, opts)
     end
@@ -28,12 +29,14 @@ module FedaPay
         )
       end
 
-      params = { payouts: [{ id: id, scheduled_at: scheduled_at.to_s }] }.merge(params)
+      params = {
+        payouts: [{ id: id, scheduled_at: scheduled_at.to_s }]
+      }.merge(params)
 
       start(params, opts)
     end
 
-    def self.scheduleAll(payouts = [], params = {}, opts = {})
+    def self.schedule_all(payouts = [], params = {}, opts = {})
       items = payouts.map do |payout|
         unless (id = payout['id'])
           raise InvalidRequestError.new(
@@ -42,11 +45,7 @@ module FedaPay
         end
 
         item = { id: id}
-
-        if payout['scheduled_at']
-          item[:scheduled_at] = payout['scheduled_at']
-        end
-
+        item[:scheduled_at] = payout['scheduled_at'] if payout['scheduled_at']
         item
       end
 
@@ -55,7 +54,7 @@ module FedaPay
       start(params, opts)
     end
 
-    def self.sendAllNow(payouts = [], params = {}, opts = {})
+    def self.send_all_now(payouts = [], params = {}, opts = {})
       items = payouts.map do |payout|
         unless (id = payout['id'])
           raise InvalidRequestError.new(
@@ -63,7 +62,7 @@ module FedaPay
           )
         end
 
-        { id: id, send_now: true}
+        { id: id, send_now: true }
       end
 
       params = { payouts: items }.merge(params)

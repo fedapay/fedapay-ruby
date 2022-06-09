@@ -6,10 +6,31 @@ module FedaPay
     include FedaPay::APIOperations::Delete
     include FedaPay::APIOperations::Save
     extend FedaPay::APIOperations::List
+    extend FedaPay::APIOperations::Search
 
     OBJECT_NAME = 'transaction'.freeze
 
-    @@available_mobile_money = %w[mtn moov mtn_ci]
+    @@available_mobile_money = %w[
+      mtn moov mtn_ci moov_tg mtn_open airtel_ne free_sn
+      togocel
+    ]
+
+    @@paid_status = %w[
+      approved transferred refunded approved_partially_refunded
+      transferred_partially_refunded
+    ]
+
+    def was_paid?
+      @@paid_status.include?(status)
+    end
+
+    def was_fefunded?
+      status.include?('refunded')
+    end
+
+    def was_partially_refunded?
+      status.include?('partially_refunded')
+    end
 
     def generate_token
       url = "#{resource_url}/token"
@@ -19,7 +40,7 @@ module FedaPay
     end
 
     def send_now_with_token(mode, token, params)
-      unless mode_available(mode)
+      unless mode_available?(mode)
         raise ArgumentError, "Invalid payment method '#{mode}' supplied. " \
                 'You have to use one of the following payment methods ' \
                 "[#{@@available_mobile_money.join(', ')}]"
@@ -40,7 +61,7 @@ module FedaPay
 
     private
 
-    def mode_available(mode)
+    def mode_available?(mode)
       @@available_mobile_money.include?(mode)
     end
   end

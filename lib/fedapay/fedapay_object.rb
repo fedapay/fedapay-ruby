@@ -253,7 +253,9 @@ module FedaPay
         unsaved = @unsaved_values.include?(k)
         if options[:force] || unsaved || v.is_a?(FedaPayObject)
           update_hash[k.to_sym] =
-            serialize_params_value(@values[k], @original_values[k], unsaved, options[:force], key: k)
+            serialize_params_value(
+              @values[k], @original_values[k], unsaved, options[:force], key: k
+            )
         end
       end
 
@@ -357,7 +359,8 @@ module FedaPay
         begin
           mth = method(name)
         rescue NameError
-          raise NoMethodError, "Cannot set #{attr} on this object. HINT: you can't set: #{@@permanent_attributes.to_a.join(', ')}"
+          raise NoMethodError, "Cannot set #{attr} on this object. HINT: "\
+                               "you can't set: #{@@permanent_attributes.to_a.join(', ')}"
         end
         return mth.call(args[0])
       elsif @values.key?(name)

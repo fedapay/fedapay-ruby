@@ -4,8 +4,8 @@ module FedaPay
   class Payout < APIResource
     extend FedaPay::APIOperations::List
     extend FedaPay::APIOperations::Create
-    extend FedaPay::APIOperations::Delete
-    extend FedaPay::APIOperations::Save
+    include FedaPay::APIOperations::Delete
+    include FedaPay::APIOperations::Save
     extend FedaPay::APIOperations::Search
 
     OBJECT_NAME = 'payout'.freeze

@@ -14,6 +14,7 @@ require 'fedapay/version'
 require 'fedapay/api_operations/create'
 require 'fedapay/api_operations/delete'
 require 'fedapay/api_operations/list'
+require 'fedapay/api_operations/search'
 require 'fedapay/api_operations/request'
 require 'fedapay/api_operations/save'
 

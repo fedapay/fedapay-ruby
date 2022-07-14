@@ -8,7 +8,7 @@ gemspec
 gem 'faraday', '~>1.8'
 
 group :development do
-  gem 'bundler'
+  gem 'bundler', '~>1.6'
   gem 'faker'
   gem 'minitest', '~> 5.0'
   gem 'minitest-reporters'

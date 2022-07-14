@@ -4,5 +4,7 @@ language: ruby
 cache: bundler
 rvm:
   - 2.4.2
-before_install: gem install bundler -v 1.16.6
-before_install: gem uninstall -i /home/travis/.rvm/gems/ruby-2.4.2@global bundler
+before_install: 
+  - yes | gem uninstall -i /home/travis/.rvm/gems/ruby-2.4.2@global bundler
+  - gem install bundler -v 1.16.6
+  

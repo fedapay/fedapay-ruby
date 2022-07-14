@@ -39,11 +39,7 @@ module FedaPay
       end
     end
 
-    test 'make test' do 
-      assert true
-    end
-
-    context "generate header" do
+    it "generate header" do
       should "generate a header in valid format" do
         timestamp = Time.now
         signature = FedaPay::WebhookSignature.computeSignature(

@@ -8,7 +8,7 @@ gemspec
 group :development do
   gem 'bundler', '~> 2.3.17'
   gem 'faker'
-  gem 'minitest', '~> 5.0'
+  gem 'minitest', '~> 5.8.4'
   gem 'minitest-reporters'
   gem 'mocha', '~> 0.13.2'
   gem 'rake', '>= 12.3.3'

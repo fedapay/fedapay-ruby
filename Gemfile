@@ -5,6 +5,8 @@ git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 # Specify your gem's dependencies in fedapay.gemspec
 gemspec
 
+gem 'faraday', '~>1.8'
+
 group :development do
   gem 'bundler'
   gem 'faker'

@@ -39,33 +39,31 @@ module FedaPay
       end
     end
 
-    describe "hedear generation" do
-      it "generate header" do
-        it "generate a header in valid format" do
-          timestamp = Time.now
-          signature = FedaPay::WebhookSignature.computeSignature(
-            EVENT_PAYLOAD,
-            SECRET
-          )
-          scheme = "v1"
-          header = FedaPay::WebhookSignature.generateHeader(
-            timestamp,
-            signature,
-            scheme: scheme
-          )
-          assert_equal("t=#{timestamp.to_i},#{scheme}=#{signature}", header)
-        end
+    context "generate header" do
+      should "generate a header in valid format" do
+        timestamp = Time.now
+        signature = FedaPay::WebhookSignature.computeSignature(
+          EVENT_PAYLOAD,
+          SECRET
+        )
+        scheme = "v1"
+        header = FedaPay::WebhookSignature.generateHeader(
+          timestamp,
+          signature,
+          scheme: scheme
+        )
+        assert_equal("t=#{timestamp.to_i},#{scheme}=#{signature}", header)
       end
     end
 
-    describe "construct event" do
-      it "return an Event instance from a valid JSON payload and valid signature header" do
+    context "construct event" do
+      should "return an Event instance from a valid JSON payload and valid signature header" do
         header = generate_header
         event = FedaPay::Webhook.constructEvent(EVENT_PAYLOAD, header, SECRET)
         assert event.is_a?(FedaPay::Event)
       end
 
-      it "raise a JSON::ParserError from an invalid JSON payload" do
+      should "raise a JSON::ParserError from an invalid JSON payload" do
         assert_raises JSON::ParserError do
           payload = "this is not valid JSON"
           header = generateHeader(payload: payload)
@@ -73,7 +71,7 @@ module FedaPay
         end
       end
 
-      it "raise a Signature Verification Error from a valid JSON payload and an invalid signature header" do
+      should "raise a Signature Verification Error from a valid JSON payload and an invalid signature header" do
         header = "bad_header"
         assert_raises FedaPay::SignatureVerificationError do
           FedaPay::Webhook.constructEvent(EVENT_PAYLOAD, header, SECRET)
@@ -81,46 +79,46 @@ module FedaPay
       end
     end
 
-    describe "verify signature header" do
-      it "raise a SignatureVerificationError when the header does not have the expected format" do
+    context "verify signature header" do
+      should "raise a SignatureVerificationError when the header does not have the expected format" do
         header = "i'm not even a real signature header"
         assert_raises(FedaPay::SignatureVerificationError) do
           FedaPay::WebhookSignature.verifyHeader(EVENT_PAYLOAD, header, "secret")
         end
       end
 
-      it "raise a Signature verification error when there are no signatures with the expected scheme" do
+      should "raise a Signature verification error when there are no signatures with the expected scheme" do
         header = generate_header(scheme: "v0")
         assert_raises(FedaPay::SignatureVerificationError) do
           FedaPay::WebhookSignature.verifyHeader(EVENT_PAYLOAD, header, "secret")
         end
       end
 
-      it "raise a Signature verification error when there are no valid signatures for the payload" do
+      should "raise a Signature verification error when there are no valid signatures for the payload" do
         header = generate_header(signature: "bad_signature")
         assert_raises(FedaPay::SignatureVerificationError) do
           FedaPay::WebhookSignature.verifyHeader(EVENT_PAYLOAD, header, "secret")
         end
       end
 
-      it "raise a Signature verification error when the timestamp is not within the tolerance" do
+      should "raise a Signature verification error when the timestamp is not within the tolerance" do
         header = generate_header(timestamp: Time.now - 15)
         assert_raises(FedaPay::SignatureVerificationError) do
           FedaPay::WebhookSignature.verifyHeader(EVENT_PAYLOAD, header, SECRET, tolerance: 10)
         end
       end
 
-      it "return true when the header contains a valid signature and the timestamp is within the tolerance" do
+      should "return true when the header contains a valid signature and the timestamp is within the tolerance" do
         header = generate_header
         assert(FedaPay::WebhookSignature.verifyHeader(EVENT_PAYLOAD, header, SECRET, tolerance: 10))
       end
 
-      it "return true when the header contains at least one valid signature" do
+      should "return true when the header contains at least one valid signature" do
         header = generate_header + ",v1=bad_signature"
         assert(FedaPay::WebhookSignature.verifyHeader(EVENT_PAYLOAD, header, SECRET, tolerance: 10))
       end
 
-      it "return true when the header contains a valid signature and the timestamp is off but no tolerance is provided" do
+      should "return true when the header contains a valid signature and the timestamp is off but no tolerance is provided" do
         header = generate_header(timestamp: Time.at(12345))
         assert(FedaPay::WebhookSignature.verifyHeader(EVENT_PAYLOAD, header, SECRET))
       end

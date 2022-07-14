@@ -6,11 +6,10 @@ git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 gemspec
 
 group :development do
-  gem 'bundler', '~> 2.3.17'
+  gem 'bundler', '~> 1.15'
   gem 'faker'
   gem 'minitest', '~> 5.0'
   gem 'minitest-reporters'
-  gem 'minitest-spec-context'
   gem 'mocha', '~> 0.13.2'
   gem 'rake', '>= 12.3.3'
   gem 'rubocop', '0.52.1'

@@ -16,10 +16,14 @@ module FedaPay
       opts[:secret] ||= SECRET
       opts[:scheme] ||= FedaPay::WebhookSignature.EXPECTED_SCHEME
       opts[:signature] ||= FedaPay::WebhookSignature.computeSignature(
-        opts[:timestamp], opts[:payload], opts[:secret]
+        opts[:timestamp],
+        opts[:payload],
+        opts[:secret]
       )
       FedaPay::WebhookSignature.generateHeader(
-        opts[:timestamp], opts[:signature], scheme: opts[:scheme]
+        opts[:timestamp],
+        opts[:signature],
+        scheme: opts[:scheme]
       )
     end
 
@@ -27,7 +31,8 @@ module FedaPay
       it "compute a signature which can then be verified" do
         timestamp = Time.now
         signature = FedaPay::WebhookSignature.computeSignature(
-          EVENT_PAYLOAD, SECRET
+          EVENT_PAYLOAD,
+          SECRET
         )
         header = generateHeader(timestamp: timestamp, signature: signature)
         assert(FedaPay::WebhookSignature.verifyHeader(EVENT_PAYLOAD, header, SECRET))

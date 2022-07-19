@@ -39,8 +39,8 @@ module FedaPay
       end
     end
 
-    context "generate header" do
-      should "generate a header in valid format" do
+    describe "generate header" do
+      before "generate a header in valid format" do
         timestamp = Time.now
         signature = FedaPay::WebhookSignature.computeSignature(
           EVENT_PAYLOAD,

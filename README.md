@@ -4,12 +4,20 @@ Welcome to your new gem! In this directory, you'll find the files you need to be
 
 TODO: Delete this and the text above, and describe your gem
 
+## Require
+
+Please specify version 1.8 of faraday in your project if you have already installed it beforehand
+
+``` ruby
+gem 'faraday', '~>1.8'
+```
+
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ``` ruby
-gem 'fedapay-ruby'
+gem 'fedapay', '~>0.1.20', git: 'https://github.com/fedapay/fedapay-ruby.git'
 ```
 
 And then execute:
